@@ -1,0 +1,120 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@theme {
+  --color-reddit-orange: #FF4500;
+  --animate-gradient-xy: gradient-xy 15s ease infinite;
+  --animate-pulse-glow: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --font-sans: 'Inter', 'Outfit', sans-serif;
+
+  @keyframes gradient-xy {
+    0%, 100% {
+      background-size: 400% 400%;
+      background-position: left top;
+    }
+    50% {
+      background-size: 200% 200%;
+      background-position: right bottom;
+    }
+  }
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 25px rgba(255, 69, 0, 0.8));
+    }
+  }
+}
+
+/* Custom CSS properties for theme controls */
+:root {
+  --bg-color: #FFFFFF;
+  --card-bg: #F8FAFC;
+  --border-color: #E2E8F0;
+  --text-color: #0F172A;
+  --text-secondary: #64748B;
+  --accent: #FF4500;
+  --accent-glow: rgba(255, 69, 0, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(226, 232, 240, 0.6);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+}
+
+:root.dark {
+  --bg-color: #0F172A;
+  --card-bg: #1E293B;
+  --border-color: #334155;
+  --text-color: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --accent: #FF4500;
+  --accent-glow: rgba(255, 69, 0, 0.25);
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(51, 65, 85, 0.6);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+}
+
+/* Global body overrides */
+body {
+  @apply transition-colors duration-300 font-sans antialiased;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* Glassmorphism custom classes */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-panel-hover:hover {
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px -10px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Typing indicator dot animations */
+@keyframes typingBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.dot-bounce-1 {
+  animation: typingBounce 1s infinite 0.1s;
+}
+.dot-bounce-2 {
+  animation: typingBounce 1s infinite 0.2s;
+}
+.dot-bounce-3 {
+  animation: typingBounce 1s infinite 0.3s;
+}

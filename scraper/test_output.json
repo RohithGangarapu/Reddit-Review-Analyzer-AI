@@ -1,0 +1,95 @@
+{
+    "query": "best machine learning laptop",
+    "posts": [
+        {
+            "title": "Which laptop should I buy for machine learning",
+            "url": "https://www.reddit.com/r/learnmachinelearning/comments/1umbvzs/which_laptop_should_i_buy_for_machine_learning/",
+            "subreddit": "learnmachinelearning",
+            "author": "Uncool_NPC",
+            "upvotes": "1",
+            "comment_count": "9",
+            "comments": [
+                {
+                    "author": "aramkrat",
+                    "text": "I wouldn't buy a laptop for machine learning. Simple models can be run on cpu and if you ever need real compute then might as well try to get acess to compute/servers through school or any community. Its better for you to learn to ssh and run scripts in servers ratger than carrying around a heavy laptop.",
+                    "score": "4",
+                    "depth": 0,
+                    "created": "2026-07-03T11:56:56.199000+0000"
+                },
+                {
+                    "author": "Standard_Iron6393",
+                    "text": "so laptop totally depends on your budget , because in ml higher the ram , it is good , but you have to see your budget. i will go for the mac.",
+                    "score": "3",
+                    "depth": 0,
+                    "created": "2026-07-03T11:42:50.418000+0000"
+                },
+                {
+                    "author": "Divyanshailani",
+                    "text": "man apple raised the price so much",
+                    "score": "1",
+                    "depth": 1,
+                    "created": "2026-07-03T11:48:24.132000+0000"
+                },
+                {
+                    "author": "Standard_Iron6393",
+                    "text": "get the used one",
+                    "score": "1",
+                    "depth": 2,
+                    "created": "2026-07-03T12:22:33.631000+0000"
+                },
+                {
+                    "author": "Sea-Picture2656",
+                    "text": "my friend, gone are those days when you buy laptops based on GPUs for your ml projects. Everything is on cloud these days, i would say buy a basic laptop with 32 gb ram which is light and easy to carry around.",
+                    "score": "2",
+                    "depth": 0,
+                    "created": "2026-07-03T15:35:16.828000+0000"
+                }
+            ]
+        },
+        {
+            "title": "Looking for a laptop for machine learning and data science under 90k₹",
+            "url": "https://www.reddit.com/r/laptops/comments/1u2uldj/looking_for_a_laptop_for_machine_learning_and/",
+            "subreddit": "laptops",
+            "author": "SuspiciousPraline674",
+            "upvotes": "2",
+            "comment_count": "7",
+            "comments": [
+                {
+                    "author": "chuggingdeemer",
+                    "text": "6-8 hours battery life? Chuck all the gaming laptops out of the window then.Get the Yoga Slim 7 or Asus Vivobook S16 OLED.",
+                    "score": "2",
+                    "depth": 0,
+                    "created": "2026-06-11T10:19:26.489000+0000"
+                },
+                {
+                    "author": "perishjudahjuice",
+                    "text": "Bhaiya can u suggest any laptop under 70k ??? For coding , gaming bilkul nhi krni hai",
+                    "score": "1",
+                    "depth": 1,
+                    "created": "2026-06-11T11:20:24.952000+0000"
+                },
+                {
+                    "author": "Wrong-Secretary-2507",
+                    "text": "https://www.reddit.com/r/IndianTechCentral/s/yjrWT659OE",
+                    "score": "1",
+                    "depth": 2,
+                    "created": "2026-06-12T09:52:23.052000+0000"
+                },
+                {
+                    "author": "Practical-Twist-5608",
+                    "text": "Idk about specific models of laptop, but a piece of advise is If you are running AI models locally Always use a stand to elevate the laptop, plugged in, change thermal paste frequently, etc because there's high chances of damaging your laptop",
+                    "score": "1",
+                    "depth": 0,
+                    "created": "2026-06-11T10:07:49.962000+0000"
+                },
+                {
+                    "author": "soulofundead",
+                    "text": "What is your budget exactly brooFirst you say 70k to 90kThen 70k maxAnyways if your budget is 70k to 90k i preferhp victus r7 7445hs rtx 4050Don't buy acer part are badBuy asus 3050 with 1tb if you wantTry getting lenovo of you getting it",
+                    "score": "1",
+                    "depth": 0,
+                    "created": "2026-06-11T10:08:22.753000+0000"
+                }
+            ]
+        }
+    ]
+}
