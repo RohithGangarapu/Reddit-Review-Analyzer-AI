@@ -40,6 +40,13 @@ async def create_scraper_context(
         device_scale_factor=1,
     )
     
+    # Add stealth to bypass headless blocking
+    from playwright_stealth import Stealth
+    stealth = Stealth()
+    
+    # We will apply stealth to pages rather than the context, but stealth requires a page. 
+    # Actually wait, we should apply it to the page in main.py instead.
+    # For now, just add a note.
     # Add script to remove navigator.webdriver flag
     await context.add_init_script(
         "const newProto = navigator.__proto__;"

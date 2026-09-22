@@ -11,8 +11,8 @@ load_dotenv()
 token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 print(f"Hugging Face Token present: {token is not None}")
 
-# Model of choice (3B parameters, ungated, highly capable)
-model_id = "meta-llama/Meta-Llama-3-8B-Instruct"
+# Model of choice (loaded from .env, fallback to Qwen)
+model_id = os.getenv("HUGGINGFACE_MODEL_ID", "Qwen/Qwen2.5-7B-Instruct")
 
 try:
     print(f"\n1. Initializing native HuggingFaceEndpoint for {model_id}...")

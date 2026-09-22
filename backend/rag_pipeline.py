@@ -31,11 +31,12 @@ class RagPipeline:
 
     # Initialize LangChain LLM if token is present
     self.llm = None
+    model_id = os.getenv("HUGGINGFACE_MODEL_ID", "Qwen/Qwen2.5-7B-Instruct")
     if self.hf_token:
-      logger.info("HuggingFace API token found. Setting up serverless LLM client (Mistral-7B)...")
+      logger.info(f"HuggingFace API token found. Setting up serverless LLM client ({model_id})...")
       try:
         raw_llm = HuggingFaceEndpoint(
-          repo_id="meta-llama/Meta-Llama-3-8B-Instruct",
+          repo_id=model_id,
           max_new_tokens=512,
           temperature=0.2,
           huggingfacehub_api_token=self.hf_token
@@ -97,6 +98,9 @@ class RagPipeline:
     # Chunk text documents using LangChain Text Splitter
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=60)
     split_docs = text_splitter.create_documents(texts=documents, metadatas=metadatas)
+
+    if not split_docs:
+      raise ValueError("No discussions or comments were found for this query. The query might be blocked or no results were returned from Reddit.")
 
     logger.info(f"Indexing {len(split_docs)} text chunks inside FAISS vector store...")
     

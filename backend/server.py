@@ -78,7 +78,7 @@ async def analyze_query(request: AnalyzeRequest):
       posts_limit=5,
       comments_limit=12,
       output_file=str(output_file),
-      headless=True
+      headless=False
     )
     logger.info("Playwright Reddit Scraper completed successfully.")
   except Exception as e:
@@ -106,6 +106,9 @@ async def analyze_query(request: AnalyzeRequest):
     logger.info("Triggering RAG analysis and vector index generation...")
     analysis_result = rag_pipeline.generate_analysis(query, posts, session_id)
     return analysis_result
+  except ValueError as ve:
+    logger.warning(f"Analysis failed due to missing data: {ve}")
+    raise HTTPException(status_code=404, detail=str(ve))
   except Exception as e:
     logger.error(f"RAG compilation analysis failed: {e}", exc_info=True)
     raise HTTPException(status_code=500, detail=f"RAG processing failed: {str(e)}")
