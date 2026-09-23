@@ -9,7 +9,7 @@ import { ProsCard } from './components/Pros/ProsCard';
 import { ConsCard } from './components/Cons/ConsCard';
 import { StatsCard } from './components/Stats/StatsCard';
 import { SourcesCard } from './components/Sources/SourcesCard';
-import { ChatWindow } from './components/Chat/ChatWindow';
+import { FloatingChat } from './components/Chat/FloatingChat';
 import { Footer } from './components/Footer/Footer';
 import type { AnalyzeResponse, Message } from './types';
 import { analyzeQuery, chatWithKnowledge } from './services/api';
@@ -69,6 +69,9 @@ export const App: React.FC = () => {
         setLoadingStep(step);
       });
       setResult(data);
+      
+      // Auto-scroll to top when results load
+      setTimeout(() => scrollToTop(), 100);
     } catch (err: any) {
       showToast(err?.message || "Failed to process Reddit discussions. Please verify your scraper connection.");
     } finally {
@@ -163,28 +166,27 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Grid layout for Dashboard Cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column: Summary and Consensus */}
-              <div className="lg:col-span-2 space-y-6">
-                <SummaryCard summary={result.summary} query={result.query} />
-                <ConsensusCard consensus={result.consensus} />
-              </div>
-
-              {/* Right Column: Pros and Cons checklists */}
-              <div className="space-y-6">
+            {/* Clean, modular layout stack */}
+            <div className="space-y-8">
+              {/* 1. Summary Card - Full Width */}
+              <SummaryCard summary={result.summary} query={result.query} />
+              
+              {/* 2. Pros and Cons - Side-by-Side Split */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <ProsCard pros={result.pros} />
                 <ConsCard cons={result.cons} />
               </div>
+
+              {/* 3. Consensus Data - Full Width */}
+              <ConsensusCard consensus={result.consensus} />
+
+              {/* 4. Aggregated Sources & Performance Metrics */}
+              <SourcesCard sources={result.sources} />
+              <StatsCard stats={result.stats} />
             </div>
 
-            {/* Full-width Cards: Performance Metrics & aggregated sources list */}
-            <StatsCard stats={result.stats} />
-            
-            <SourcesCard sources={result.sources} />
-
-            {/* Contextual RAG chat section */}
-            <ChatWindow
+            {/* Interactive Floating Chat AI Bot */}
+            <FloatingChat
               messages={chatMessages}
               onSendMessage={handleSendChatMessage}
               isLoading={chatLoading}
@@ -206,11 +208,11 @@ export const App: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-reddit-orange text-white shadow-lg hover:bg-orange-600 transition-all duration-200"
+            className="fixed bottom-28 right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--card-bg)] text-[var(--text-color)] border border-[var(--border-color)] shadow-lg hover:border-reddit-orange transition-all duration-200"
             title="Scroll to Top"
             id="scroll-to-top-btn"
           >
-            <FiArrowUp className="text-lg font-bold" />
+            <FiArrowUp className="text-lg" />
           </motion.button>
         )}
       </AnimatePresence>

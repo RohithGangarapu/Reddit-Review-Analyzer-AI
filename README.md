@@ -7,6 +7,7 @@ A full-stack AI application designed to scrape Reddit discussions on a given top
 ## 📖 Table of Contents
 
 - [Project Overview](#project-overview)
+- [Demo Video](#demo-video)
 - [Key Features](#key-features)
 - [Terminology](#terminology)
 - [Tech Stack](#tech-stack)
@@ -26,9 +27,15 @@ A full-stack AI application designed to scrape Reddit discussions on a given top
 
 ---
 
+## 🎥 Demo Video
+
+> **[Insert Loom/YouTube Video Link Here]**
+
+---
+
 ## ✨ Key Features
 
-- **Automated Web Scraping:** Headless Reddit scraper utilizing Playwright to extract posts and comments dynamically.
+- **Automated Web Scraping:** Lightweight RSS-based Reddit scraper that effortlessly bypasses Cloudflare security blocks and rate limits without requiring a developer API key.
 - **RAG Pipeline:** Utilizes FAISS and LangChain for semantic chunking and embedding generation.
 - **AI-Powered Analysis:** Synthesizes user reviews into concise, readable summaries.
 - **Interactive Chat Interface:** Chat with the scraped context dynamically for follow-up questions.
@@ -42,7 +49,7 @@ A full-stack AI application designed to scrape Reddit discussions on a given top
 - **FAISS (Facebook AI Similarity Search):** A highly efficient library for similarity search and clustering of dense vectors. Used here to store and query the embeddings of Reddit comments.
 - **LangChain:** A framework used to orchestrate the RAG pipeline, manage prompts, and connect language models to the FAISS vector store.
 - **Embeddings / Vector Store:** Text data converted into high-dimensional numerical vectors. When you ask a question, your query is embedded and compared against the vector store to find the most relevant context.
-- **Playwright:** An end-to-end testing and automation library used here to headlessly control a browser, bypass simple bot protections, and scrape Reddit dynamically.
+- **RSS Engine:** An unauthenticated data extraction method using Reddit's native `.rss` endpoints to collect raw text and URLs, completely avoiding IP blocks and rate limits.
 - **FastAPI:** A high-performance Python web framework used for the backend to handle concurrent API requests and serve the AI responses.
 - **Vite:** A blazing-fast build tool and development server for modern web projects, used to serve the React frontend.
 
@@ -63,14 +70,24 @@ A full-stack AI application designed to scrape Reddit discussions on a given top
 - **LangChain:** LLM Orchestration
 - **HuggingFace Hub:** Open-source Language Models
 - **FAISS:** Local Vector Database
-- **Playwright (Async API):** Reddit Scraping Engine
+- **RSS (feedparser & BeautifulSoup):** Reddit Scraping Engine
 
 ---
 
 ## ⚙️ Project Architecture & Workflow
 
+### Code Execution Data Flow
+Navigating the code is straightforward. Here is the step-by-step path a request takes through the system:
+1. **Frontend Request** ➔ `frontend/src/services/api.ts` (Sends query to backend)
+2. **Backend Route** ➔ `backend/server.py` (`/api/analyze` endpoint receives request)
+3. **RSS Scraper** ➔ `scraper/reddit_scraper/main.py` (Searches Reddit and delegates to `search_rss.py` and `comments_rss.py`)
+4. **Data Export** ➔ `scraper/output.json` (Scraper dumps raw collected posts and comments)
+5. **RAG Pipeline** ➔ `backend/rag_pipeline.py` (Reads JSON, chunks comments, builds FAISS index, and calls LLM)
+6. **Frontend Render** ➔ `frontend/src/App.tsx` (Receives structured JSON from backend and renders the Dashboard)
+
+### High-Level Workflow
 1. **User Request:** The user submits a search query (e.g., "Best noise canceling headphones") via the React Frontend.
-2. **Scraper Invocation:** The FastAPI backend receives the request and triggers the `playwright` Reddit scraper (`scraper/reddit_scraper/main.py`).
+2. **Scraper Invocation:** The FastAPI backend receives the request and triggers the `RSS-based` Reddit scraper (`scraper/reddit_scraper/main.py`).
 3. **Data Collection:** The scraper navigates Reddit, fetches top posts and their comments, and saves the structured data to an `output.json` file.
 4. **Vector Embedding:** The backend's RAG Pipeline (`backend/rag_pipeline.py`) loads the JSON data, chunks it, converts it into embeddings using HuggingFace models, and stores it locally in a FAISS vector database.
 5. **LLM Synthesis:** The pipeline uses an LLM to generate an overarching summary of the posts, which is returned to the frontend.

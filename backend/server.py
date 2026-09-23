@@ -72,10 +72,10 @@ async def analyze_query(request: AnalyzeRequest):
   # 1. Trigger the Playwright Scraper
   try:
     logger.info(f"Triggering Playwright Reddit Scraper for query: '{query}'...")
-    # Scrape 5 posts with 12 comments each to keep processing time fast (<10 seconds)
+    # Scrape 30 posts with 12 comments each for robust analysis
     await run_scraper(
       query=query,
-      posts_limit=5,
+      posts_limit=30,
       comments_limit=12,
       output_file=str(output_file),
       headless=False

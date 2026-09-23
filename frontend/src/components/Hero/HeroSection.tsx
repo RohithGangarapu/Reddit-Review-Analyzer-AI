@@ -19,9 +19,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSearch, isLoading })
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-reddit-orange/20 bg-reddit-orange/5 text-reddit-orange text-xs font-semibold uppercase tracking-wider mb-6"
+          className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-reddit-orange/20 bg-reddit-orange/5 text-reddit-orange text-xs font-semibold uppercase tracking-wider mb-6 shadow-[0_0_15px_rgba(255,69,0,0.1)]"
         >
-          <span>✨ Powered by AI RAG Pipeline</span>
+          <span>✨ Powered by Authentic Community Discussions</span>
         </motion.div>
 
         <motion.h2

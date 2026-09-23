@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Stats } from '../../types';
 import { motion } from 'framer-motion';
-import { FiActivity, FiFileText, FiMessageSquare, FiCpu, FiDatabase, FiClock } from 'react-icons/fi';
+import { FiActivity, FiFileText, FiMessageSquare, FiUsers, FiCheckCircle, FiClock } from 'react-icons/fi';
 
 interface StatsCardProps {
   stats: Stats;
@@ -20,18 +20,6 @@ export const StatsCard: React.FC<StatsCardProps> = ({ stats }) => {
       value: stats.commentsRetrieved,
       icon: FiMessageSquare,
       color: "text-amber-500 bg-amber-500/10 dark:bg-amber-500/20"
-    },
-    {
-      label: "Embedding Count",
-      value: stats.embeddingCount,
-      icon: FiCpu,
-      color: "text-purple-500 bg-purple-500/10 dark:bg-purple-500/20"
-    },
-    {
-      label: "Vector Matches",
-      value: stats.vectorMatches,
-      icon: FiDatabase,
-      color: "text-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20"
     },
     {
       label: "Processing Time",
@@ -53,7 +41,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({ stats }) => {
         <h3 className="text-lg font-bold text-[var(--text-color)]">Performance Metrics</h3>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {metricItems.map((item, idx) => {
           const Icon = item.icon;
           return (

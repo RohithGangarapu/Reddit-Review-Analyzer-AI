@@ -84,7 +84,9 @@ class RagPipeline:
         c_text = comment.get("text", "")
         c_score = comment.get("score", 0)
         
-        comment_text = f"Subreddit: r/{subreddit} | Post Title: {post_title} | Comment by u/{c_author}: {c_text}"
+        # Only embed the raw comment text to preserve high-density semantic meaning
+        # We store the context (author, post) purely in metadata for the LLM prompt later
+        comment_text = c_text
         documents.append(comment_text)
         metadatas.append({
           "type": "comment",
@@ -96,7 +98,8 @@ class RagPipeline:
         })
 
     # Chunk text documents using LangChain Text Splitter
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=60)
+    # Use larger chunks to keep full comments intact, preventing semantic fragmentation
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=150)
     split_docs = text_splitter.create_documents(texts=documents, metadatas=metadatas)
 
     if not split_docs:
@@ -135,8 +138,8 @@ class RagPipeline:
       try:
         # Load the index we just created
         db = FAISS.load_local(index_meta["store_path"], self.embeddings, allow_dangerous_deserialization=True)
-        # Search the top 10 chunks to feed as context for the synthesis prompt
-        docs = db.similarity_search(query, k=10)
+        # Search the top 40 chunks to feed as context for the synthesis prompt
+        docs = db.similarity_search(query, k=40)
         context_str = "\n\n".join([f"Source: {d.metadata.get('author')} (r/{d.metadata.get('subreddit')})\nContent: {d.page_content}" for d in docs])
         
         prompt = ChatPromptTemplate.from_messages([
@@ -161,8 +164,6 @@ class RagPipeline:
           parsed_data["stats"] = {
             "postsAnalyzed": index_meta["posts_count"],
             "commentsRetrieved": index_meta["total_comments"],
-            "embeddingCount": index_meta["chunks_count"],
-            "vectorMatches": 12,
             "processingTime": 4.12
           }
           parsed_data["sources"] = self._format_sources_payload(posts_data)
@@ -329,8 +330,6 @@ class RagPipeline:
       "stats": {
         "postsAnalyzed": index_meta["posts_count"],
         "commentsRetrieved": index_meta["total_comments"],
-        "embeddingCount": index_meta["chunks_count"],
-        "vectorMatches": 8,
         "processingTime": 3.42
       },
       "sources": self._format_sources_payload(posts_data)

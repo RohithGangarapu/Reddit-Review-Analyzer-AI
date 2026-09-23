@@ -38,8 +38,6 @@ const sunscreenMockData: AnalyzeResponse = {
   stats: {
     postsAnalyzed: 6,
     commentsRetrieved: 148,
-    embeddingCount: 215,
-    vectorMatches: 89,
     processingTime: 3.84
   },
   sources: [
@@ -157,8 +155,6 @@ const laptopMockData: AnalyzeResponse = {
   stats: {
     postsAnalyzed: 12,
     commentsRetrieved: 412,
-    embeddingCount: 520,
-    vectorMatches: 180,
     processingTime: 4.62
   },
   sources: [
@@ -234,8 +230,6 @@ const generateFallbackMockData = (query: string): AnalyzeResponse => {
     stats: {
       postsAnalyzed: 8,
       commentsRetrieved: 230,
-      embeddingCount: 310,
-      vectorMatches: 112,
       processingTime: 3.12
     },
     sources: [
@@ -299,7 +293,7 @@ export const analyzeQuery = async (
   // 1: Collecting Posts
   // 2: Collecting Comments
   // 3: Generating Embeddings
-  // 4: Searching Vector Database
+  // 4: Scanning discussions
   // 5: Generating AI Summary
   const runProgressSimulation = async () => {
     if (onProgress) {

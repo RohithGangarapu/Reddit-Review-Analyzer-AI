@@ -25,8 +25,6 @@ export interface ConsensusItem {
 export interface Stats {
   postsAnalyzed: number;
   commentsRetrieved: number;
-  embeddingCount: number;
-  vectorMatches: number;
   processingTime: number; // in seconds
 }
 

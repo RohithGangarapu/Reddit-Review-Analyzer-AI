@@ -10,9 +10,9 @@ const steps = [
   { label: "Searching Reddit...", icon: FiSearch },
   { label: "Collecting Posts...", icon: FiLayers },
   { label: "Collecting Comments...", icon: FiMessageSquare },
-  { label: "Generating Embeddings...", icon: FiCpu },
-  { label: "Searching Vector Database...", icon: FiDatabase },
-  { label: "Generating AI Summary...", icon: FiFileText }
+  { label: "Scanning Discussions...", icon: FiCpu },
+  { label: "Synthesizing Consensus...", icon: FiDatabase },
+  { label: "Generating Final Summary...", icon: FiFileText }
 ];
 
 export const LoadingTimeline: React.FC<LoadingTimelineProps> = ({ currentStep }) => {
@@ -24,10 +24,10 @@ export const LoadingTimeline: React.FC<LoadingTimelineProps> = ({ currentStep })
 
         <div className="flex flex-col items-center mb-8">
           <h3 className="text-xl font-bold text-[var(--text-color)] text-center">
-            Processing Discussion Graph
+            Analyzing Community Discussions
           </h3>
           <p className="text-sm text-[var(--text-secondary)] mt-1 text-center">
-            Scraping comments, computing vector models, and summarizing consensus...
+            Gathering authentic opinions and synthesizing a consensus...
           </p>
         </div>
 
@@ -93,7 +93,7 @@ export const LoadingTimeline: React.FC<LoadingTimelineProps> = ({ currentStep })
                       animate={{ opacity: 1, x: 0 }}
                       className="text-xs text-[var(--text-secondary)] font-normal mt-0.5"
                     >
-                      Analyzing text nodes...
+                      Processing real user feedback...
                     </motion.div>
                   )}
                 </div>

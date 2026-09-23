@@ -11,6 +11,8 @@ from search import search_reddit
 from comments import expand_and_extract_comments
 from search_json import search_reddit_json
 from comments_json import expand_and_extract_comments_json
+from search_rss import search_reddit_rss
+from comments_rss import expand_and_extract_comments_rss
 from utils import create_scraper_context
 
 # Configure logging to output to stdout with timestamps
@@ -27,7 +29,7 @@ async def run_scraper(
     comments_limit: int,
     output_file: str,
     headless: bool,
-    method: str = "json"
+    method: str = "rss"
 ) -> None:
     logger.info(f"Starting Reddit scraper for query: '{query}' using method '{method}'")
     
@@ -119,6 +121,43 @@ async def run_scraper(
         except Exception as e:
             logger.error(f"Fatal error during JSON scraping: {e}", exc_info=True)
 
+    elif method == "rss":
+        try:
+            logger.info("Executing Reddit search via RSS API...")
+            posts_metadata = await search_reddit_rss(query, limit=posts_limit)
+            
+            if not posts_metadata:
+                logger.warning("No search results found. Exiting.")
+                return _write_empty_result(query, output_file)
+                
+            scraped_posts_models = []
+            for idx, post_data in enumerate(posts_metadata):
+                post_url = post_data["url"]
+                logger.info(f"[{idx+1}/{len(posts_metadata)}] Processing post: '{post_data['title']}' ({post_url})")
+                
+                try:
+                    comments_data = await expand_and_extract_comments_rss(post_url, limit=comments_limit)
+                    comments_models = [CommentModel(**c) for c in comments_data]
+                    post_model = PostModel(
+                        title=post_data["title"], url=post_data["url"], subreddit=post_data["subreddit"],
+                        author=post_data["author"], upvotes=post_data["upvotes"], comment_count=len(comments_models),
+                        comments=comments_models
+                    )
+                    scraped_posts_models.append(post_model)
+                except Exception as e:
+                    logger.error(f"Error scraping post at {post_url}: {e}", exc_info=True)
+                    post_model = PostModel(
+                        title=post_data["title"], url=post_data["url"], subreddit=post_data["subreddit"],
+                        author=post_data["author"], upvotes=post_data["upvotes"], comment_count=0,
+                        comments=[]
+                    )
+                    scraped_posts_models.append(post_model)
+                    
+            _write_final_result(query, scraped_posts_models, output_file)
+            
+        except Exception as e:
+            logger.error(f"Fatal error during RSS scraping: {e}", exc_info=True)
+
 def _write_empty_result(query: str, output_file: str) -> None:
     result = ScraperResult(query=query, posts=[])
     with open(output_file, "w", encoding="utf-8") as f:
@@ -148,8 +187,8 @@ def main() -> None:
         "--headful", action="store_true", help="Run browser in headful mode (Playwright only)."
     )
     parser.add_argument(
-        "--method", type=str, choices=["playwright", "json"], default="json",
-        help="Scraping method to use: 'json' (bypasses blocks, fast) or 'playwright' (simulates real browser). Default is 'json'."
+        "--method", type=str, choices=["playwright", "json", "rss"], default="rss",
+        help="Scraping method to use: 'rss' (bypasses blocks completely), 'json' (api), or 'playwright'. Default is 'rss'."
     )
     
     args = parser.parse_args()
