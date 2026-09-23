@@ -2,6 +2,7 @@ import os
 import uuid
 import json
 import logging
+import re
 from pathlib import Path
 from langchain_huggingface import HuggingFaceEmbeddings, HuggingFaceEndpoint, ChatHuggingFace
 from langchain_community.vectorstores import FAISS
@@ -37,7 +38,7 @@ class RagPipeline:
       try:
         raw_llm = HuggingFaceEndpoint(
           repo_id=model_id,
-          max_new_tokens=512,
+          max_new_tokens=2048,
           temperature=0.2,
           huggingfacehub_api_token=self.hf_token
         )
@@ -84,9 +85,9 @@ class RagPipeline:
         c_text = comment.get("text", "")
         c_score = comment.get("score", 0)
         
-        # Only embed the raw comment text to preserve high-density semantic meaning
-        # We store the context (author, post) purely in metadata for the LLM prompt later
-        comment_text = c_text
+        # Embed the post title alongside the comment so the core topic is preserved in the vector space
+        # This fixes the issue where generic comments lack semantic context during FAISS retrieval
+        comment_text = f"Topic: {post_title} | Comment: {c_text}"
         documents.append(comment_text)
         metadatas.append({
           "type": "comment",
@@ -143,8 +144,8 @@ class RagPipeline:
         context_str = "\n\n".join([f"Source: {d.metadata.get('author')} (r/{d.metadata.get('subreddit')})\nContent: {d.page_content}" for d in docs])
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert AI product research analyst. Synthesize a comprehensive review summary based on these retrieved Reddit comments. Format your output STRICTLY as a valid JSON object matching the requested structure. Do not write anything else, only return the raw JSON object."),
-            ("human", "Query: \"{query}\"\n\nReddit Context:\n{context}\n\nRequested JSON Structure:\n{{\n  \"summary\": \"A large paragraph (8-10 lines) describing community consensus, product comparisons, main trade-offs, and popular choices highlighted in discussions.\",\n  \"pros\": [\n    \"Advantage 1 with detail\",\n    \"Advantage 2 with detail\",\n    \"Advantage 3 with detail\",\n    \"Advantage 4 with detail\"\n  ],\n  \"cons\": [\n    \"Tradeoff 1 with detail\",\n    \"Tradeoff 2 with detail\",\n    \"Tradeoff 3 with detail\",\n    \"Tradeoff 4 with detail\"\n  ],\n  \"consensus\": [\n    {{\"product\": \"Product A\", \"score\": 92, \"confidence\": \"High\"}},\n    {{\"product\": \"Product B\", \"score\": 84, \"confidence\": \"High\"}},\n    {{\"product\": \"Product C\", \"score\": 70, \"confidence\": \"Medium\"}}\n  ]\n}}")
+            ("system", "You are an expert AI product research analyst. Synthesize a comprehensive review summary based ONLY on the provided Reddit comments. CRITICAL INSTRUCTION: You must STRICTLY focus on information highly relevant to the user's query. Completely ignore off-topic comments. If a comment does not relate to the query, skip it. Format your output STRICTLY as a valid JSON object matching the requested structure. Do not write anything else, only return the raw JSON object."),
+            ("human", "Query: \"{query}\"\n\nReddit Context:\n{context}\n\nRequested JSON Structure:\n{{\n  \"summary\": \"A large paragraph (8-10 lines) describing community consensus, product comparisons, main trade-offs, and popular choices highlighted in discussions that explicitly match the user query.\",\n  \"pros\": [\n    \"Advantage 1 with detail\",\n    \"Advantage 2 with detail\",\n    \"Advantage 3 with detail\",\n    \"Advantage 4 with detail\"\n  ],\n  \"cons\": [\n    \"Tradeoff 1 with detail\",\n    \"Tradeoff 2 with detail\",\n    \"Tradeoff 3 with detail\",\n    \"Tradeoff 4 with detail\"\n  ],\n  \"consensus\": [\n    {{\"product\": \"Product A\", \"score\": 92, \"confidence\": \"High\"}},\n    {{\"product\": \"Product B\", \"score\": 84, \"confidence\": \"High\"}},\n    {{\"product\": \"Product C\", \"score\": 70, \"confidence\": \"Medium\"}}\n  ]\n}}")
         ])
         
         chain = prompt | self.llm | StrOutputParser()
@@ -187,7 +188,7 @@ class RagPipeline:
     # Load FAISS index
     try:
       db = FAISS.load_local(str(store_path), self.embeddings, allow_dangerous_deserialization=True)
-      docs = db.similarity_search(question, k=4)
+      docs = db.similarity_search(question, k=20)
       context_str = "\n\n".join([f"Post/Comment by u/{d.metadata.get('author')} in r/{d.metadata.get('subreddit')}:\n{d.page_content}" for d in docs])
     except Exception as e:
       logger.error(f"Error loading vector index: {e}")
@@ -278,7 +279,7 @@ class RagPipeline:
         { "product": "Haruharu Black Rice Airyfit", "score": 76, "confidence": "Medium" },
         { "product": "Beauty of Joseon Sun Stick", "score": 55, "confidence": "Low" }
       ]
-    elif "laptop" in q_lower or "computer" in q_lower or "ai" in q_lower or "ml" in q_lower:
+    elif "laptop" in q_lower or "computer" in q_lower or re.search(r'\b(ai|ml)\b', q_lower):
       summary = "For AI development and machine learning engineering, Reddit consensus strongly favors **Apple MacBook Pro (M3/M4 Max)** for local LLM inference and prototyping due to its unified memory architecture. The ability to allocate up to 128GB+ of VRAM allows running 70B parameter models locally.\n\nHowever, for training models, deep learning tasks requiring native CUDA acceleration, or running Windows-specific software, laptops powered by **NVIDIA RTX 4090/4080 Mobile GPUs** (such as the **Lenovo Legion Pro 7i** or **ASUS ROG Zephyrus G16**) are highly recommended. While they offer true CUDA compatibility and high raw compute, they are held back by high power draw, noise, and short battery life. The **Framework Laptop 16** is appreciated for modularity, but criticized for lower performance relative to price."
       pros = [
         "MacBook Pro Max provides massive unified memory (up to 128GB+) for running large model weights locally.",
