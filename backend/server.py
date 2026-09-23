@@ -77,16 +77,15 @@ async def analyze_query(request: AnalyzeRequest):
       query=query,
       posts_limit=30,
       comments_limit=12,
-      output_file=str(output_file),
-      headless=False
+      output_file=str(output_file)
     )
-    logger.info("Playwright Reddit Scraper completed successfully.")
+    logger.info("RSS Reddit Scraper completed successfully.")
   except Exception as e:
     logger.error(f"Scraper execution failed: {e}. Attempting to recover using cached data.")
     if not output_file.exists():
       raise HTTPException(
         status_code=500, 
-        detail=f"Playwright scraper failed and no cached data exists. Error: {str(e)}"
+        detail=f"RSS scraper failed and no cached data exists. Error: {str(e)}"
       )
 
   # 2. Read the Scraped JSON Output
