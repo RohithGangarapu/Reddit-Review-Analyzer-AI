@@ -38,7 +38,7 @@ class RagPipeline:
       try:
         raw_llm = HuggingFaceEndpoint(
           repo_id=model_id,
-          max_new_tokens=2048,
+          max_new_tokens=4096,
           temperature=0.2,
           huggingfacehub_api_token=self.hf_token
         )
@@ -144,8 +144,8 @@ class RagPipeline:
         context_str = "\n\n".join([f"Source: {d.metadata.get('author')} (r/{d.metadata.get('subreddit')})\nContent: {d.page_content}" for d in docs])
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert AI product research analyst. Synthesize a comprehensive review summary based ONLY on the provided Reddit comments. CRITICAL INSTRUCTION: You must STRICTLY focus on information highly relevant to the user's query. Completely ignore off-topic comments. If a comment does not relate to the query, skip it. Format your output STRICTLY as a valid JSON object matching the requested structure. Do not write anything else, only return the raw JSON object."),
-            ("human", "Query: \"{query}\"\n\nReddit Context:\n{context}\n\nRequested JSON Structure:\n{{\n  \"summary\": \"A large paragraph (8-10 lines) describing community consensus, product comparisons, main trade-offs, and popular choices highlighted in discussions that explicitly match the user query.\",\n  \"pros\": [\n    \"Advantage 1 with detail\",\n    \"Advantage 2 with detail\",\n    \"Advantage 3 with detail\",\n    \"Advantage 4 with detail\"\n  ],\n  \"cons\": [\n    \"Tradeoff 1 with detail\",\n    \"Tradeoff 2 with detail\",\n    \"Tradeoff 3 with detail\",\n    \"Tradeoff 4 with detail\"\n  ],\n  \"consensus\": [\n    {{\"product\": \"Product A\", \"score\": 92, \"confidence\": \"High\"}},\n    {{\"product\": \"Product B\", \"score\": 84, \"confidence\": \"High\"}},\n    {{\"product\": \"Product C\", \"score\": 70, \"confidence\": \"Medium\"}}\n  ]\n}}")
+            ("system", "You are an expert AI product research analyst. Synthesize a concise review summary based ONLY on the provided Reddit comments. CRITICAL INSTRUCTION: Be extremely concise to save tokens. Focus strictly on highly relevant information. Format your output STRICTLY as a valid JSON object matching the requested structure. Do not write anything else, only return the raw JSON object."),
+            ("human", "Query: \"{query}\"\n\nReddit Context:\n{context}\n\nRequested JSON Structure:\n{{\n  \"summary\": \"A concise paragraph (3-4 sentences) summarizing community consensus, top choices, and main trade-offs.\",\n  \"pros\": [\n    \"Advantage 1 concise\",\n    \"Advantage 2 concise\",\n    \"Advantage 3 concise\"\n  ],\n  \"cons\": [\n    \"Tradeoff 1 concise\",\n    \"Tradeoff 2 concise\",\n    \"Tradeoff 3 concise\"\n  ],\n  \"consensus\": [\n    {{\"product\": \"Top Product A\", \"score\": 92, \"confidence\": \"High\"}},\n    {{\"product\": \"Top Product B\", \"score\": 84, \"confidence\": \"High\"}}\n  ]\n}}")
         ])
         
         chain = prompt | self.llm | StrOutputParser()
@@ -154,8 +154,9 @@ class RagPipeline:
         
         # Clean response and parse JSON
         json_start = response.find("{")
-        json_end = response.rfind("}") + 1
-        if json_start != -1 and json_end != -1:
+        last_brace = response.rfind("}")
+        if json_start != -1 and last_brace != -1 and last_brace >= json_start:
+          json_end = last_brace + 1
           cleaned_json = response[json_start:json_end]
           parsed_data = json.loads(cleaned_json)
           
@@ -169,6 +170,8 @@ class RagPipeline:
           }
           parsed_data["sources"] = self._format_sources_payload(posts_data)
           return parsed_data
+        else:
+          logger.warning(f"No JSON object found in LangChain response. Raw response: {response}")
           
       except Exception as e:
         logger.error(f"Error executing LangChain synthesis, falling back to dynamic parser: {e}")
